@@ -4,45 +4,75 @@ FirstChallengeMarika::FirstChallengeMarika():private_nh("")
 {
     private_nh.param("hz",hz_,{10});
     private_nh.param("distance",distance_,{1});
-    sub_pose = nh.subscribe ("/roomba/Odometry",10,&FirstChallengeMarika::pose_callback,this);
+    sub_pose = nh.subscribe ("/roomba/odometry",10,&FirstChallengeMarika::pose_callback,this);
+    pub_cmd_vel = nh.advertise<geometry_msgs::Twist>("/roomba/RoombaCtrl",1);
 }
 
 void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg)
 {
+    stop_sign_ = 0;
+
+    old_pose = current_pose;
     current_pose = *msg;
+
+    dx_ = old_pose.pose.pose.position.x - current_pose.pose.pose.position.x;
+    sum_x_ += dx_;
+    if(sum_x_ >= 1 || current_pose.pose.pose.position.x > 1)
+    {
+        stop_sign_ = 1;
+    }
+
+    if(current_pose.pose.pose.orientation.z < 0)
+    {
+        current_pose.pose.pose.orientation.z += 2*M_PI;
+    }
+
+    dtheta_ = old_pose.pose.pose.orientation.z - current_pose.pose.pose.orientation.z;
+    sum_theta_ += dtheta_;
+
+    if(sum_theta_ >= 2*M_PI)
+    {
+        stop_sign_ = 2;
+        sum_x_ = 0.0;
+    }
 }
 
-void FirstChallengeMarika::go_straight(int i)
+void FirstChallengeMarika::go_straight()
 {
-    if(i<=10)
+    roomba_500driver_meiji::RoombaCtrl a;
+
+    geometry_msgs::Twist cntl;
+    a.mode = 11;
+
+    if(stop_sign_  == 1)
     {
-       X = current_pose.pose.pose.position.x;
+        std::cout<<"turn"<<std::endl;
+        cntl.linear.x = 0.0;
+        cntl.angular.z = 0.1;
     }
 
-    x = current_pose.pose.pose.position.x;
-    std::cout<<x<<std::endl;
-    geometry_msgs::Twist cmd_vel;
-
-    cmd_vel.linear.x = 0.1;
-    if(x - X >= 1){
-        cmd_vel.linear.x = 0.0;
+    else if(stop_sign_ == 0)
+    {
+        std::cout<<"go!"<<std::endl;
+        cntl.linear.x = 0.5;
     }
 
-    pub_cmd_vel.publish(cmd_vel);
+
+    pub_cmd_vel.publish(cntl);
 
 }
 
 void FirstChallengeMarika::process()
 {
     ros::Rate loop_rate(hz_);
-    int i = 0;
+    sum_x_ = 0;
+    sum_theta_ = 0;
 
     while(ros::ok())
     {
-        go_straight(i);
+        go_straight();
         ros::spinOnce();
         loop_rate.sleep();
-        i++;
     }
 }
 

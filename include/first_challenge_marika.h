@@ -15,20 +15,24 @@ class FirstChallengeMarika
     private:
         //method
         void pose_callback(const nav_msgs::Odometry::ConstPtr &msg);
-        void go_straight(int);
+        void go_straight();
 
         //parameter
         int hz_;
         double distance_;
 
-        double X;
-        double x;
+        int stop_sign_;
+        double dx_;
+        double dtheta_;
+        double sum_x_;
+        double sum_theta_;
 
         //member
         ros::NodeHandle nh;
         ros::NodeHandle private_nh;
         ros::Subscriber sub_pose;
         ros::Publisher pub_cmd_vel;
+        nav_msgs::Odometry old_pose;
         nav_msgs::Odometry current_pose;
 };
 #endif
