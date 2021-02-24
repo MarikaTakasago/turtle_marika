@@ -23,7 +23,7 @@ void FirstChallengeMarika::go_straight(int i)
     std::cout<<x<<std::endl;
     geometry_msgs::Twist cmd_vel;
 
-    cmd_vel.linear.x = 0.5;
+    cmd_vel.linear.x = 0.1;
     if(x - X >= 1){
         cmd_vel.linear.x = 0.0;
     }
