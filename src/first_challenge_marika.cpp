@@ -5,7 +5,7 @@ FirstChallengeMarika::FirstChallengeMarika():private_nh("")
     private_nh.param("hz",hz_,{10});
     private_nh.param("distance",distance_,{1});
     sub_pose = nh.subscribe ("/roomba/odometry",10,&FirstChallengeMarika::pose_callback,this);
-    pub_cmd_vel = nh.advertise<geometry_msgs::Twist>("/roomba/RoombaCtrl",1);
+    pub_cmd_vel = nh.advertise<roomba_500driver_meiji::RoombaCtrl>("/roomba/control",1);
 }
 
 void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg)
@@ -39,22 +39,21 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
 void FirstChallengeMarika::go_straight()
 {
-    roomba_500driver_meiji::RoombaCtrl a;
+    roomba_500driver_meiji::RoombaCtrl cntl;
 
-    geometry_msgs::Twist cntl;
-    a.mode = 11;
+    cntl.mode = 11;
 
     if(stop_sign_  == 1)
     {
         std::cout<<"turn"<<std::endl;
-        cntl.linear.x = 0.0;
-        cntl.angular.z = 0.1;
+        cntl.cntl.linear.x = 0.0;
+        cntl.cntl.angular.z = 0.1;
     }
 
     else if(stop_sign_ == 0)
     {
         std::cout<<"go!"<<std::endl;
-        cntl.linear.x = 0.5;
+        cntl.cntl.linear.x = 0.5;
     }
 
 
