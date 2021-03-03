@@ -8,6 +8,12 @@ FirstChallengeMarika::FirstChallengeMarika():private_nh("")
     pub_cmd_vel = nh.advertise<roomba_500driver_meiji::RoombaCtrl>("/roomba/control",1);
 }
 
+void GetRPY(const geometry_msgs::Quaternion &q,double &roll,double &pitch,double &yaw)
+{
+    tf::Quaternion quat(q.x,q.y,q.z,q.w);
+    tf::Matrix3x3(quat).getRPY(roll,pitch,yaw);
+}
+
 void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg)
 {
     stop_sign_ = 0;
@@ -22,42 +28,52 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
         stop_sign_ = 1;
     }
 
-    if(current_pose.pose.pose.orientation.z < 0)
+    old_yaw = yaw;
+    GetRPY(current_pose.pose.pose.orientation,roll,pitch,yaw);
+
+    if(yaw < 0)//orientation.zをオイラー角に。
     {
-        current_pose.pose.pose.orientation.z += 2*M_PI;
+        yaw += 2*M_PI;
     }
 
-    dtheta_ = old_pose.pose.pose.orientation.z - current_pose.pose.pose.orientation.z;
+    dtheta_ = old_yaw - yaw;
     sum_theta_ += dtheta_;
 
     if(sum_theta_ >= 2*M_PI)
     {
-        stop_sign_ = 2;
+        stop_sign_ = 0;
         sum_x_ = 0.0;
     }
 }
 
 void FirstChallengeMarika::go_straight()
 {
-    roomba_500driver_meiji::RoombaCtrl cntl;
+    roomba_500driver_meiji::RoombaCtrl cmd_vel;
 
-    cntl.mode = 11;
+    cmd_vel.mode = 11;
 
     if(stop_sign_  == 1)
     {
         std::cout<<"turn"<<std::endl;
-        cntl.cntl.linear.x = 0.0;
-        cntl.cntl.angular.z = 0.1;
+        cmd_vel.cntl.linear.x = 0.0;
+        cmd_vel.cntl.angular.z = 0.3;
     }
 
     else if(stop_sign_ == 0)
     {
         std::cout<<"go!"<<std::endl;
-        cntl.cntl.linear.x = 0.5;
+        cmd_vel.cntl.linear.x = 0.5;
+    }
+
+    else if(stop_sign_ == 2)
+    {
+        std::cout<<"stop"<<std::endl;
+        cmd_vel.cntl.angular.z = 0.0;
+        cmd_vel.cntl.linear.x = 0.0;
     }
 
 
-    pub_cmd_vel.publish(cntl);
+    pub_cmd_vel.publish(cmd_vel);
 
 }
 

@@ -4,7 +4,7 @@
 #include <ros/ros.h>
 #include "nav_msgs/Odometry.h"
 #include "roomba_500driver_meiji/RoombaCtrl.h"
-
+#include "tf/transform_listener.h"
 
 class FirstChallengeMarika
 {
@@ -20,6 +20,11 @@ class FirstChallengeMarika
         //parameter
         int hz_;
         double distance_;
+
+        double roll;
+        double pitch;
+        double yaw;
+        double old_yaw;
 
         int stop_sign_;
         double dx_;
