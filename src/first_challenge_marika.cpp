@@ -40,7 +40,7 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
     if(dtheta_ < -M_PI)
     {
-        stop_sign_ = 0;
+        stop_sign_ = 2;
     }
 }
 
