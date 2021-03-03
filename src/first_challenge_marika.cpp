@@ -21,7 +21,7 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
     old_pose = current_pose;
     current_pose = *msg;
 
-    dx_ = old_pose.pose.pose.position.x - current_pose.pose.pose.position.x;
+    dx_ = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx_;
     if(sum_x_ >= 1 || current_pose.pose.pose.position.x > 1)
     {
@@ -36,9 +36,9 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
         yaw += 2*M_PI;
     }
 
-    dtheta_ = yaw-old_yaw;
+    dtheta_ = yaw - old_yaw;
 
-    if(sum_theta_ >= 2*M_PI)
+    if(sum_theta_ >= 2*M_PI || yaw > 2*M_PI)
     {
         stop_sign_ = 0;
     }
@@ -57,6 +57,8 @@ void FirstChallengeMarika::go_straight()
         cmd_vel.cntl.angular.z = 0.3;
         std::cout<<yaw<<std::endl;
         sum_theta_ += dtheta_;
+        std::cout<<dtheta_<<std::endl;
+        std::cout<<sum_theta_<<std::endl;
     }
 
     else if(stop_sign_ == 0)
