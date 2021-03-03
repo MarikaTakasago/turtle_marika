@@ -23,7 +23,7 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
     dx_ = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx_;
-    if(sum_x_ >= 1 || current_pose.pose.pose.position.x > 1)
+    if(sum_x_ >= 1)
     {
         stop_sign_ = 1;
     }
@@ -53,6 +53,7 @@ void FirstChallengeMarika::go_straight()
     if(stop_sign_  == 1)
     {
         sum_x_ = 0.0;
+        dx_ = 0.0;
         std::cout<<"turn"<<std::endl;
         cmd_vel.cntl.linear.x = 0.0;
         cmd_vel.cntl.angular.z = 0.5;
