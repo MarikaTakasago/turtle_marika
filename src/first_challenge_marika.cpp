@@ -52,8 +52,6 @@ void FirstChallengeMarika::go_straight()
 
     if(stop_sign_  == 1)
     {
-        sum_x_ = 0.0;
-        dx_ = 0.0;
         std::cout<<"turn"<<std::endl;
         cmd_vel.cntl.linear.x = 0.0;
         cmd_vel.cntl.angular.z = 0.5;
@@ -74,6 +72,7 @@ void FirstChallengeMarika::go_straight()
 
     else if(stop_sign_ == 2)
     {
+        sum_x_ = 0.0;
         dtheta_ = -2*M_PI;
         sum_theta_ = 0.0;
         std::cout<<"go-go!"<<std::endl;
