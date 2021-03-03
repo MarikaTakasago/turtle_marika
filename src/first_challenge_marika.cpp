@@ -63,6 +63,7 @@ void FirstChallengeMarika::go_straight()
     {
         std::cout<<"go!"<<std::endl;
         cmd_vel.cntl.linear.x = 0.2;
+        std::cout<<current_pose.pose.pose.position.x<<std::endl;
         std::cout<<sum_x_<<std::endl;
     }
 
