@@ -94,7 +94,7 @@ void FirstChallengeMarika::go_straight()
         std::cout<<"go-go!"<<std::endl;
         cmd_vel.cntl.angular.z = 0.0;
         cmd_vel.cntl.linear.x = 0.2;
-        std::cout<<current_range.ranges[540]<<std::endl;
+        //std::cout<<current_range.ranges[539]<<std::endl;
     }
 
     else if(stop_sign_ == 3)
