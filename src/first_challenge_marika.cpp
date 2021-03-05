@@ -25,7 +25,7 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
     dx_ = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx_;
-    if(sum_x_ >= 1)
+    if(sum_x_ >= 0.5)
     {
         stop_sign_ = 1;
     }
