@@ -18,7 +18,6 @@ void GetRPY(const geometry_msgs::Quaternion &q,double &roll,double &pitch,double
 
 void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg)
 {
-    stop_sign_ = 0;
 
     old_pose = current_pose;
     current_pose = *msg;
@@ -82,6 +81,7 @@ void FirstChallengeMarika::go_straight()
         sum_theta_ = 0.0;
         std::cout<<"go!"<<std::endl;
         cmd_vel.cntl.linear.x = 0.2;
+        cmd_vel.cntl.angular.z = 0.0;
         std::cout<<current_pose.pose.pose.position.x<<std::endl;
         std::cout<<sum_x_<<std::endl;
     }
@@ -114,6 +114,9 @@ void FirstChallengeMarika::process()
     ros::Rate loop_rate(hz_);
     sum_x_ = 0;
     sum_theta_ = 0;
+    dtheta_ = 0.0;
+    dx_ = 0.0;
+    stop_sign_ = 0;
 
     while(ros::ok())
     {
