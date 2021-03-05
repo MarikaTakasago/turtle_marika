@@ -4,7 +4,9 @@ FirstChallengeMarika::FirstChallengeMarika():private_nh("")
 {
     private_nh.param("hz",hz_,{10});
     private_nh.param("distance",distance_,{1});
+    private_nh.param("stop_distance_",stop_distance_,{0.5});
     sub_pose = nh.subscribe ("/roomba/odometry",10,&FirstChallengeMarika::pose_callback,this);
+    sub_range = nh.subscribe ("/urg_node/laserscan",10,&FirstChallengeMarika::range_callback,this);
     pub_cmd_vel = nh.advertise<roomba_500driver_meiji::RoombaCtrl>("/roomba/control",1);
 }
 
@@ -23,7 +25,7 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
     dx_ = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx_;
-    if(sum_x_ >= 1)
+    if(sum_x_ >= distance_)
     {
         stop_sign_ = 1;
     }
@@ -42,6 +44,20 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
     {
         stop_sign_ = 2;
     }
+}
+
+void FirstChallengeMarika::range_callback(const sensor_msgs::LaserScan::ConstPtr &msg)
+{
+    current_range = *msg;
+
+    if(current_range.ranges.size() >= 1000)
+    {
+        if(current_range.ranges[539]<= 0.5)
+        {
+            stop_sign_ = 3;
+        }
+    }
+
 }
 
 void FirstChallengeMarika::go_straight()
@@ -78,6 +94,14 @@ void FirstChallengeMarika::go_straight()
         std::cout<<"go-go!"<<std::endl;
         cmd_vel.cntl.angular.z = 0.0;
         cmd_vel.cntl.linear.x = 0.2;
+        std::cout<<current_range.ranges[540]<<std::endl;
+    }
+
+    else if(stop_sign_ == 3)
+    {
+        cmd_vel.cntl.linear.x = 0.0;
+        cmd_vel.cntl.angular.z = 0.0;
+        std::cout<<"stop..."<<std::endl;
     }
 
 
