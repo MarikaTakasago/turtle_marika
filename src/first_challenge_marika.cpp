@@ -25,7 +25,7 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
     dx_ = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx_;
-    if(sum_x_ >= distance_)
+    if(sum_x_ >= 1)
     {
         stop_sign_ = 1;
     }
@@ -52,7 +52,7 @@ void FirstChallengeMarika::range_callback(const sensor_msgs::LaserScan::ConstPtr
 
     if(current_range.ranges.size() >= 1000)
     {
-        if(current_range.ranges[539]<= 0.5)
+        if(current_range.ranges[539] <= 0.5)
         {
             stop_sign_ = 3;
         }
