@@ -5,8 +5,8 @@ FirstChallengeMarika::FirstChallengeMarika():private_nh("")
     private_nh.param("hz",hz_,{10});
     private_nh.param("distance",distance_,{1});
     private_nh.param("stop_distance_",stop_distance_,{0.5});
-    sub_pose = nh.subscribe ("/roomba/odometry",10,&FirstChallengeMarika::pose_callback,this);
-    sub_range = nh.subscribe ("/urg_node/laserscan",10,&FirstChallengeMarika::range_callback,this);
+    sub_pose = nh.subscribe("/roomba/odometry",10,&FirstChallengeMarika::pose_callback,this);
+    sub_range = nh.subscribe("/urg_node/laserscan",10,&FirstChallengeMarika::range_callback,this);
     pub_cmd_vel = nh.advertise<roomba_500driver_meiji::RoombaCtrl>("/roomba/control",1);
 }
 
@@ -19,12 +19,14 @@ void GetRPY(const geometry_msgs::Quaternion &q,double &roll,double &pitch,double
 void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg)
 {
 
+    stop_sign_ = 0;
+
     old_pose = current_pose;
     current_pose = *msg;
 
     dx_ = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx_;
-    if(sum_x_ >= 0.5)
+    if(sum_x_ >= 1)
     {
         stop_sign_ = 1;
     }
@@ -43,12 +45,14 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
     {
         stop_sign_ = 2;
     }
+
 }
 
 void FirstChallengeMarika::range_callback(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
     current_range = *msg;
 
+    std::cout<<current_range.ranges.size()<<std::endl;
     if(current_range.ranges.size() >= 1000)
     {
         std::cout<<current_range.ranges[539]<<std::endl;
@@ -114,9 +118,6 @@ void FirstChallengeMarika::process()
     ros::Rate loop_rate(hz_);
     sum_x_ = 0;
     sum_theta_ = 0;
-    dtheta_ = 0.0;
-    dx_ = 0.0;
-    stop_sign_ = 0;
 
     while(ros::ok())
     {
