@@ -2,8 +2,8 @@
 <launch>
     <node pkg = "roomba_500driver_meiji" name = "main500" type = "main500"/>
     <node pkg = "urg_node" name = "urg_node" type = "urg_node"/>
-    <node pkg = "first_challenge_marika" name = "first_challenge_marika" type = "first_challenge_marika">
-        <param name  = "hz_" value = "10"/>
+    <node pkg = "first_challenge_marika" name = "first_challenge_marika" type = "first_challenge_marika" output = "screen">
+        <param name  = "hz_" value = "50"/>
         <param name  = "distance_" value = "1.0"/>
         <param name  = "stop_distance_" value = "0.5"/>
     </node>
