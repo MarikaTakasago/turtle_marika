@@ -22,34 +22,43 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
     old_pose = current_pose;
     current_pose = *msg;
+    if(!pose_checker) old_pose = current_pose;
+    pose_checker = true;
 
     dx_ = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx_;
-    if(sum_x_ >= 1 || stop_sign_ == 1)
-    {
-        stop_sign_ = 1;
-        GetRPY(current_pose.pose.pose.orientation,roll,pitch,start_yaw);
-        sum_x_ = 0;
-    }
 
     old_yaw = yaw;
     GetRPY(current_pose.pose.pose.orientation,roll,pitch,yaw);
-    if(yaw*old_yaw<0) dtheta_ = 0;
+    if(yaw*old_yaw<0) dtheta_ = 0.0;
     else dtheta_ = fabs(yaw - old_yaw);
 
+    std::cout<<"current_x:"<<current_pose.pose.pose.position.x<<std::endl;
+    std::cout<<"current_yaw:"<<yaw<<std::endl;
+
+    if(sum_x_ >= 1 || stop_sign_ == 1)
+    {
+        stop_sign_ = 1;
+        sum_x_ = 0.0;
+        sum_theta_ += dtheta_;
+        std::cout<<"sum_theta:"<<sum_theta_<<std::endl;
+        if(sum_theta_ >= 2*M_PI) stop_sign_ = 2;
+    }
 }
 
 void FirstChallengeMarika::range_callback(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
     current_range = *msg;
 
+    double use_range = current_range.ranges.size()/2;
     // std::cout<<current_range.ranges.size()<<std::endl;
     if(current_range.ranges.size() >= 1000)
     {
         // std::cout<<current_range.ranges[539]<<std::endl;
-        if(current_range.ranges[539] <= 0.5 && stop_sign_ == 2)
+        if(stop_sign_ = 2)
         {
-            stop_sign_ = 3;
+            std::cout<<"dist:"<<current_range.ranges[use_range]<<std::endl;
+            if(current_range.ranges[use_range] <= stop_distance_) stop_sign_ = 3;
         }
     }
 
@@ -61,34 +70,26 @@ void FirstChallengeMarika::go_straight()
 
     cmd_vel.mode = 11;
 
-    if(stop_sign_  == 1)
-    {
-        // std::cout<<"turn"<<std::endl;
-        cmd_vel.cntl.linear.x = 0.0;
-        cmd_vel.cntl.angular.z = 0.5;
-        std::cout<<"old"<<old_yaw<<std::endl;
-        std::cout<<"current"<<yaw<<std::endl;
-        std::cout<<sum_theta_<<std::endl;
-        sum_theta_ += dtheta_;
-        if(sum_theta_ >= 2*M_PI) stop_sign_ = 2;
-            // std::cout<<dtheta_<<std::endl;
-            // std::cout<<sum_theta_<<std::endl;
-    }
-
-    else if(stop_sign_ == 0)
+    if(stop_sign_ == 0)
     {
         sum_theta_ = 0.0;
         std::cout<<"go!"<<std::endl;
         cmd_vel.cntl.linear.x = 0.2;
         cmd_vel.cntl.angular.z = 0.0;
-        // std::cout<<current_pose.pose.pose.position.x<<std::endl;
-        std::cout<<sum_x_<<std::endl;
+    }
+    else if(stop_sign_  == 1)
+    {
+        std::cout<<"turn"<<std::endl;
+        cmd_vel.cntl.linear.x = 0.0;
+        cmd_vel.cntl.angular.z = 0.5;
+        // sum_theta_ += dtheta_;
+        // std::cout<<"sum_theta:"<<sum_theta_<<std::endl;
+        // if(sum_theta_ >= 2*M_PI) stop_sign_ = 2;
     }
 
     else if(stop_sign_ == 2)
     {
         sum_x_ = 0.0;
-        dtheta_ = -2*M_PI;
         sum_theta_ = 0.0;
         std::cout<<"go-go!"<<std::endl;
         cmd_vel.cntl.angular.z = 0.0;
@@ -98,7 +99,6 @@ void FirstChallengeMarika::go_straight()
     else if(stop_sign_ == 3)
     {
         sum_x_  = 0.0;
-        dtheta_ = -2*M_PI;
         cmd_vel.cntl.linear.x = 0.0;
         cmd_vel.cntl.angular.z = 0.0;
         std::cout<<"stop..."<<std::endl;
@@ -115,6 +115,7 @@ void FirstChallengeMarika::process()
     sum_x_ = 0;
     sum_theta_ = 0;
     old_yaw = 0;
+    yaw = 0;
 
     while(ros::ok())
     {

@@ -36,6 +36,7 @@ class FirstChallengeMarika
         double dtheta_;
         double sum_x_;
         double sum_theta_;
+        bool pose_checker = false;
 
         //member
         ros::NodeHandle nh;
