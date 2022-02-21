@@ -24,6 +24,7 @@ class FirstChallengeMarika
         int hz_;
         double distance_;
         float stop_distance_;
+        double start_yaw;
 
         double roll;
         double pitch;
