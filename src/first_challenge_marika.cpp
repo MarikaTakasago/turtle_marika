@@ -4,7 +4,8 @@ FirstChallengeMarika::FirstChallengeMarika():private_nh("")
 {
     private_nh.param("hz",hz_,{50});
     private_nh.param("distance",distance_,{1});
-    private_nh.param("stop_distance_",stop_distance_,{0.5});
+    private_nh.param("stop_distance",stop_distance_,{0.5});
+    // std::cout<<"sd"<<stop_distance_<<std::endl;
     private_nh.param("stop_sign_",stop_sign_,{0});
     sub_pose = nh.subscribe("/roomba/odometry",10,&FirstChallengeMarika::pose_callback,this);
     sub_range = nh.subscribe("/scan",10,&FirstChallengeMarika::range_callback,this);
@@ -41,7 +42,7 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
         stop_sign_ = 1;
         sum_x_ = 0.0;
         sum_theta_ += dtheta_;
-        std::cout<<"sum_theta:"<<sum_theta_<<std::endl;
+        // std::cout<<"sum_theta:"<<sum_theta_<<std::endl;
         if(sum_theta_ >= 2*M_PI) stop_sign_ = 2;
     }
 }
@@ -50,15 +51,22 @@ void FirstChallengeMarika::range_callback(const sensor_msgs::LaserScan::ConstPtr
 {
     current_range = *msg;
 
-    double use_range = current_range.ranges.size()/2;
+    int use_range = current_range.ranges.size()/2;
+    double range = 0.0;
+    int sum = 0;;
     // std::cout<<current_range.ranges.size()<<std::endl;
     if(current_range.ranges.size() >= 1000)
     {
         // std::cout<<current_range.ranges[539]<<std::endl;
         if(stop_sign_ = 2)
         {
-            std::cout<<"dist:"<<current_range.ranges[use_range]<<std::endl;
-            if(current_range.ranges[use_range] <= stop_distance_) stop_sign_ = 3;
+            for(int i=use_range-5;i<use_range+5;i++)
+            {
+                range += current_range.ranges[i];
+                sum += 1;
+            }
+            std::cout<<"dist:"<<range/sum<<std::endl;
+            if(range/10 <= stop_distance_) stop_sign_ = 3;
         }
     }
 
@@ -73,13 +81,13 @@ void FirstChallengeMarika::go_straight()
     if(stop_sign_ == 0)
     {
         sum_theta_ = 0.0;
-        std::cout<<"go!"<<std::endl;
+        // std::cout<<"go!"<<std::endl;
         cmd_vel.cntl.linear.x = 0.2;
         cmd_vel.cntl.angular.z = 0.0;
     }
     else if(stop_sign_  == 1)
     {
-        std::cout<<"turn"<<std::endl;
+        // std::cout<<"turn"<<std::endl;
         cmd_vel.cntl.linear.x = 0.0;
         cmd_vel.cntl.angular.z = 0.5;
         // sum_theta_ += dtheta_;
@@ -91,7 +99,7 @@ void FirstChallengeMarika::go_straight()
     {
         sum_x_ = 0.0;
         sum_theta_ = 0.0;
-        std::cout<<"go-go!"<<std::endl;
+        // std::cout<<"go-go!"<<std::endl;
         cmd_vel.cntl.angular.z = 0.0;
         cmd_vel.cntl.linear.x = 0.2;
     }
@@ -101,7 +109,7 @@ void FirstChallengeMarika::go_straight()
         sum_x_  = 0.0;
         cmd_vel.cntl.linear.x = 0.0;
         cmd_vel.cntl.angular.z = 0.0;
-        std::cout<<"stop..."<<std::endl;
+        // std::cout<<"stop..."<<std::endl;
     }
 
 
