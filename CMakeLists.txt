@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(first_challenge_marika)
+project(turtle_marika)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -135,7 +135,7 @@ include
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/first_challenge_marika_node.cpp)
-add_executable(first_challenge_marika src/first_challenge_marika.cpp)
+add_executable(turtle_marika src/first_challenge_marika.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -146,13 +146,13 @@ add_executable(first_challenge_marika src/first_challenge_marika.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(first_challenge_marika ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(turtle_marika ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(first_challenge_marika ${catkin_LIBRARIES})
+target_link_libraries(turtle_marika ${catkin_LIBRARIES})
 
 #############
 ## Install ##
