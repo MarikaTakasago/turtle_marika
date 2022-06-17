@@ -27,8 +27,8 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
 
     double dx = current_pose.pose.pose.position.x - old_pose.pose.pose.position.x;
     sum_x_ += dx;
-    std::cout << sum_x_ <<std::endl;
-    std::cout << stop_sign_ <<std::endl;
+    // std::cout << sum_x_ <<std::endl;
+    std::cout <<"flag:"<< stop_sign_ <<std::endl;
 
 
     old_yaw = yaw;
@@ -36,8 +36,8 @@ void FirstChallengeMarika::pose_callback(const nav_msgs::Odometry::ConstPtr &msg
     if(yaw*old_yaw<0) dtheta_ = 0.0;
     else dtheta_ = fabs(yaw - old_yaw);
 
-    // std::cout<<"current_x:"<<current_pose.pose.pose.position.x<<std::endl;
-    // std::cout<<"current_yaw:"<<yaw<<std::endl;
+    std::cout<<"current_x:"<<current_pose.pose.pose.position.x<<std::endl;
+    std::cout<<"current_yaw:"<<yaw<<std::endl;
 
     // if(sum_x_ >= 1 || stop_sign_ == 1)
     if(sum_x_ >= 1)
