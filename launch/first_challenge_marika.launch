@@ -1,7 +1,8 @@
 <?xml version = "1.0"?>
 <launch>
+    <arg name="lidar" default="113"/>
     <node pkg = "roomba_500driver_meiji" name = "main500" type = "main500"/>
-    <node pkg = "urg_node" name = "urg_node" type = "urg_node" args="_ip_address:=192.168.1.110"/>
+    <node pkg = "urg_node" name = "urg_node" type = "urg_node" args="_ip_address:=192.168.1.$(arg lidar)"/>
     <node pkg = "turtle_marika" name = "turtle_marika" type = "turtle_marika" output = "screen">
         <param name  = "hz" value = "50"/>
         <param name  = "distance" value = "1.0"/>
